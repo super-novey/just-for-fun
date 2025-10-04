@@ -2,39 +2,23 @@ name: Auto commit
 
 on:
   schedule:
-    # chạy mỗi ngày lúc 08:00
-    - cron: "0 8 * * *"
+    - cron: '15 4,8,15 * * 0-2'
+    - cron: '0 8-20 * * 1-5'
+    - cron: '10 3-11 4-20 * *'
+
 
 jobs:
   auto_commit:
+    name: 'Auto push a commit to my repo'
     runs-on: macos-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-
-      - name: Generate random commits
-        run: |
-          git config --global user.name "Automated Tomidiyu"
-          git config --global user.email "super-novey@users.noreply.github.com"
-
-          DAY_OF_WEEK=$(date +%u) # 1=Mon .. 7=Sun
-
-          if [ $DAY_OF_WEEK -le 5 ]; then
-            # Weekdays: 5–10 commits
-            COUNT=$(( (RANDOM % 6) + 5 ))
-          else
-            # Weekends: 2–5 commits
-            COUNT=$(( (RANDOM % 4) + 2 ))
-          fi
-
-          echo "Will create $COUNT commits today."
-
-          for i in $(seq 1 $COUNT)
-          do
-            echo "$(date +%s) Commit $i" >> report.txt
-            git add report.txt
-            git commit -m "Automated report #$i"
-          done
-
+    - uses: actions/checkout@v2
+    - name: Create sample file with just timestamp
+      run: date +%s >> report.txt
+    - name: Commit file
+      run: |
+          git config --global user.name 'Automated Tomidiyu'
+          git config --global user.email 'super-novey@users.noreply.github.com'
+          git add report.txt
+          git commit -am "Automated report"
           git push
-
