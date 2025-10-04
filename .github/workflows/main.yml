@@ -1,34 +1,33 @@
-```yaml
 name: Auto commit
 
 on:
   schedule:
     # chạy mỗi ngày lúc 08:00
-    - cron: '0 8 * * *'
+    - cron: "0 8 * * *"
 
 jobs:
   auto_commit:
-    name: 'Auto push random commits to repo'
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v2
 
       - name: Generate random commits
         run: |
-          git config --global user.name 'Automated Tomidiyu'
-          git config --global user.email 'super-novey@users.noreply.github.com'
+          git config --global user.name "Automated Tomidiyu"
+          git config --global user.email "super-novey@users.noreply.github.com"
 
-          DAY_OF_WEEK=$(date +%u) # 1 = Monday, 7 = Sunday
+          DAY_OF_WEEK=$(date +%u) # 1=Mon .. 7=Sun
 
           if [ $DAY_OF_WEEK -le 5 ]; then
-            # Weekdays (Mon-Fri): 5-10 commits
+            # Weekdays: 5–10 commits
             COUNT=$(( (RANDOM % 6) + 5 ))
           else
-            # Weekends (Sat-Sun): 2-5 commits
+            # Weekends: 2–5 commits
             COUNT=$(( (RANDOM % 4) + 2 ))
           fi
 
-          echo "Will create $COUNT commits for today."
+          echo "Will create $COUNT commits today."
 
           for i in $(seq 1 $COUNT)
           do
@@ -38,4 +37,4 @@ jobs:
           done
 
           git push
-```
+
