@@ -1,24 +1,41 @@
+```yaml
 name: Auto commit
 
 on:
   schedule:
-    - cron: '15 4,8,15 * * 0-2'
-    - cron: '0 8-20 * * 1-5'
-    - cron: '10 3-11 4-20 * *'
-
+    # chạy mỗi ngày lúc 08:00
+    - cron: '0 8 * * *'
 
 jobs:
   auto_commit:
-    name: 'Auto push a commit to my repo'
+    name: 'Auto push random commits to repo'
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Create sample file with just timestamp
-      run: date +%s >> report.txt
-    - name: Commit file
-      run: |
+      - uses: actions/checkout@v2
+
+      - name: Generate random commits
+        run: |
           git config --global user.name 'Automated Tomidiyu'
           git config --global user.email 'super-novey@users.noreply.github.com'
-          git add report.txt
-          git commit -am "Automated report"
+
+          DAY_OF_WEEK=$(date +%u) # 1 = Monday, 7 = Sunday
+
+          if [ $DAY_OF_WEEK -le 5 ]; then
+            # Weekdays (Mon-Fri): 5-10 commits
+            COUNT=$(( (RANDOM % 6) + 5 ))
+          else
+            # Weekends (Sat-Sun): 2-5 commits
+            COUNT=$(( (RANDOM % 4) + 2 ))
+          fi
+
+          echo "Will create $COUNT commits for today."
+
+          for i in $(seq 1 $COUNT)
+          do
+            echo "$(date +%s) Commit $i" >> report.txt
+            git add report.txt
+            git commit -m "Automated report #$i"
+          done
+
           git push
+```
